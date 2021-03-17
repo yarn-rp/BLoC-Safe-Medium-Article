@@ -1,4 +1,4 @@
-/* part of 'counter_bloc.dart';
+part of 'counter_bloc.dart';
 
 @immutable
 abstract class CounterState {
@@ -20,4 +20,3 @@ class CounterIncremented extends CounterState {
 class CounterDecremented extends CounterState {
   CounterDecremented(int count) : super(count);
 }
- */
