@@ -17,6 +17,7 @@ class CounterBloc extends BlocSafe<CounterEvent, CounterState> {
   @override
   Map<Edge, TransitionFunction> buildTransitions() {
     Map<Edge, TransitionFunction> transitions = {};
+
     transitions.addEntries([
       incrementHandlerFromInitial,
       incrementHandlerFromCounterIncremented,

@@ -1,4 +1,4 @@
-# Flutter BLoC Safe pattern
+# Flutter BLoC Safe 
 
 ![Alt text](Frame.jpg?raw=true "Title")
 
@@ -50,4 +50,43 @@ Let's say this … I'm not reinventing the wheel. This idea has been with us si
 ## What's BLoC Safe and why I should start using it?
 
 First of all BLoC Safe works literally on top of Flutter Bloc, extending the class and changing some functionality. Thats a decision made mainly to help migration from Flutter Bloc, so yeah, if you sustitute your Bloc for BlocSafe your application will still be intact. You can still use BlocBuilders, BlocConsumers and any other Flutter Bloc widget. With that said, let's talk about the "safer" brother implementation.
+
 Bloc Safe will allow you define deterministic transitions. Instead of the mapEventToState function you need to override, in Bloc Safe you need to override a Map<Edge, Function(Event,State)> buildTransitions function. If you keep overriding mapEventToState function, Bloc Safe will behave exactly like Bloc, no matters if buildTransitions is overriden or not.
+
+Edge is class that recieves two Types, the event Type and the state Type, which will allow us to match a single <event,state> Handler for a every transition of the bloc.
+The Function(Event, State) is the function computation for the matching edge.
+Lets see an example of this :
+
+![Alt text](bloc_safe_example.png?raw=true "Title")
+In this example, that function will only be executed if the event is of type IncrementCounter and the state is of type CounterIncremented. Does this means that I need to provide always the most specific type of the event or the state? The answer is no, we will see this in a second.
+
+If you have inheritance on Events or States, and define a transition for the parent and the child, BlocSafe will take the correct transition no matters the moment you added to buildTransitions map. Lets see an example with the above example of inheritance.
+![Alt text](buildTransitions_inheritance_example.png?raw=true "Title")
+BlocSafe will take the most specific type for the given event and the currentState, so doesn't matter if someone adds new Events or new States, and change order of transitions, it will still executing the same logic (unless of course someone deletes your transition declaration). Isn't it cool?
+
+## Reflection to get ClassTypes
+
+Now you will be asking youself how can BlocSafe know the most specific type of my event. Well this is done by using reflection to get the ClassType of the event/state instance, so we can match the class that is more especific to data.
+
+## CounterBloc with BlocSafe
+
+So let's see how CounterBloc is implemented using BlocSafe.
+
+I suggest a folder structure like this one:
+![Alt text](blocSafe_folder_structure.png?raw=true "Title")
+
+In the file <your_bloc>\_transitions.dart put all your transitions definitions as you do with your events. Declare them as MapEntry's and add them to bloc. Should be something like this:
+![Alt text](transition_definitions.png?raw=true "Title")
+
+Then, just get all your transitions and add them to the transitionsBuilderMap.
+![Alt text](counter_bloc_safe.png?raw=true "Title")
+
+Finally lets see the results: Javier core la app y has un videito en gif pa q la gnt vea el funcionamiento de esta talla.
+
+## Testing advantages
+
+One of the principal advantages of migrating to BlocSafe is testing. When you make use of TDD, or just make some unit tests over your Bloc component, now you don't have to test that your bloc works properly for your specific case and not for the others cases. Just testing your transitionFunction is enough because you can rely on BlocSafe that's the only transition that's going to me executed for the given <event,state>. Isn't it great?
+
+## Final thoughts
+
+Building a secure, maintainable and scalable application takes a lot of time. BlocSafe is a tool to help you do that in less time and in a more expressive and secure way, much more resistible to future changes. If you like this package don't forget to give it a star.
